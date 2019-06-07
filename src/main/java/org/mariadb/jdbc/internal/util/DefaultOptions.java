@@ -153,6 +153,8 @@ public enum DefaultOptions {
           + " implements javax.net.SocketFactory.", false),
   PIN_GLOBAL_TX_TO_PHYSICAL_CONNECTION("pinGlobalTxToPhysicalConnection", Boolean.FALSE, "1.1.8",
       "", false),
+  IAM_AUTHENTICATION("iamAuthentication", Boolean.FALSE, "2.4.1",
+      "Authenticate using AWS IAM tokens", false),
   TRUST_SERVER_CERTIFICATE("trustServerCertificate", Boolean.FALSE, "1.1.1",
       "When using SSL, do not check server's"
           + " certificate.", false),

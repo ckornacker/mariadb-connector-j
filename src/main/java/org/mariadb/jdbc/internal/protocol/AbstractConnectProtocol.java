@@ -181,7 +181,7 @@ public abstract class AbstractConnectProtocol implements Protocol {
     this.username = (urlParser.getUsername() == null ? "" : urlParser.getUsername());
     this.awsRegion = (urlParser.getAwsRegion() == null ? "" : urlParser.getAwsRegion());
 
-    if (urlParser.getHaMode() == HaMode.IAM) {
+    if (options.iamAuthentication) {
       IamTokenGenerator iam = new IamTokenGenerator(
           this.awsRegion,
           this.username,

@@ -63,6 +63,7 @@ public class Options implements Cloneable {
   //standard options
   public String user;
   public String password;
+  public boolean iamAuthentication;
 
   //divers
   public boolean trustServerCertificate;
@@ -353,6 +354,9 @@ public class Options implements Cloneable {
     if (password != null ? !password.equals(opt.password) : opt.password != null) {
       return false;
     }
+    if (iamAuthentication != opt.iamAuthentication) {
+      return false;
+    }
     if (serverSslCert != null ? !serverSslCert.equals(opt.serverSslCert)
         : opt.serverSslCert != null) {
       return false;
@@ -562,6 +566,7 @@ public class Options implements Cloneable {
     result = 31 * result + maxIdleTime;
     result = 31 * result + poolValidMinDelay;
     result = 31 * result + (autocommit ? 1 : 0);
+    result = 31 * result + (iamAuthentication ? 1 : 0);
 
     return result;
   }

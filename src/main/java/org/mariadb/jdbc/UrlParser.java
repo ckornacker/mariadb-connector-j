@@ -68,7 +68,7 @@ import org.mariadb.jdbc.internal.util.constant.ParameterConstant;
 /**
  * <p>parse and verification of URL.</p>
  * <p>basic syntax :<br>
- * {@code jdbc:(mysql|mariadb):[replication:|failover|loadbalance:|aurora:|iam:]//<hostDescription>[,<hostDescription>]/[database>]
+ * {@code jdbc:(mysql|mariadb):[replication:|failover|loadbalance:|aurora:]//<hostDescription>[,<hostDescription>]/[database>]
  * [?<key1>=<value1>[&<key2>=<value2>]] }
  * </p>
  * <p>
