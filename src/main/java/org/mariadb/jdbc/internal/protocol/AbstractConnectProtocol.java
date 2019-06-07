@@ -111,6 +111,7 @@ import org.mariadb.jdbc.internal.protocol.authentication.AuthenticationProviderH
 import org.mariadb.jdbc.internal.protocol.authentication.DefaultAuthenticationProvider;
 import org.mariadb.jdbc.internal.protocol.tls.HostnameVerifierImpl;
 import org.mariadb.jdbc.internal.protocol.tls.SslFactory;
+import org.mariadb.jdbc.internal.util.IamTokenGenerator;
 import org.mariadb.jdbc.internal.util.Options;
 import org.mariadb.jdbc.internal.util.ServerPrepareStatementCache;
 import org.mariadb.jdbc.internal.util.Utils;
@@ -134,6 +135,7 @@ public abstract class AbstractConnectProtocol implements Protocol {
   protected final Options options;
   private final String username;
   private final String password;
+  private final String awsRegion;
   private final LruTraceCache traceCache = new LruTraceCache();
   private final GlobalStateInfo globalInfo;
   public boolean hasWarnings = false;
@@ -177,7 +179,20 @@ public abstract class AbstractConnectProtocol implements Protocol {
     this.options = urlParser.getOptions();
     this.database = (urlParser.getDatabase() == null ? "" : urlParser.getDatabase());
     this.username = (urlParser.getUsername() == null ? "" : urlParser.getUsername());
-    this.password = (urlParser.getPassword() == null ? "" : urlParser.getPassword());
+    this.awsRegion = (urlParser.getAwsRegion() == null ? "" : urlParser.getAwsRegion());
+
+    if (urlParser.getHaMode() == HaMode.IAM) {
+      IamTokenGenerator iam = new IamTokenGenerator(
+          this.awsRegion,
+          this.username,
+          this.urlParser.getPassword(),
+          urlParser.getHostAddresses().get(0).host,
+          urlParser.getHostAddresses().get(0).port);
+      this.password = iam.getAuthToken();
+    } else {
+      this.password = (urlParser.getPassword() == null ? "" : urlParser.getPassword());
+    }
+
     this.globalInfo = globalInfo;
     if (options.cachePrepStmts && options.useServerPrepStmts) {
       serverPrepareStatementCache = ServerPrepareStatementCache

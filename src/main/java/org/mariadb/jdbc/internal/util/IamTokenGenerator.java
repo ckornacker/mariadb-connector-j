@@ -50,8 +50,67 @@
  *
  */
 
-package org.mariadb.jdbc.internal.util.constant;
+package org.mariadb.jdbc.internal.util;
 
-public enum HaMode {
-  IAM, AURORA, REPLICATION, FAILOVER, SEQUENTIAL, LOADBALANCE, NONE
+import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.services.rds.auth.GetIamAuthTokenRequest;
+import com.amazonaws.services.rds.auth.RdsIamAuthTokenGenerator;
+
+
+public class IamTokenGenerator {
+
+  private final String region;
+  private final String username;
+  private final String profile;
+  private final String host;
+  private final int port;
+  private String authToken;
+
+  /**
+   * IAM Authentication plugin constructor.
+   *
+   * @param region                      AWS region
+   * @param username                    RDS username
+   * @param profile                     AWS credentials profile
+   * @param host                        RDS host
+   * @param port                        RDS port
+   */
+  public IamTokenGenerator(String region, String username, String profile, String host, int port) {
+    this.region = region;
+    this.username = username;
+    this.profile = profile;
+    this.host = host;
+    this.port = port;
+  }
+
+  /**
+   * Generates signed auth tokens from AWS credentials.
+   *
+   */
+  private void generateAuthToken() {
+    RdsIamAuthTokenGenerator generator = RdsIamAuthTokenGenerator.builder()
+        .credentials(new ProfileCredentialsProvider(profile))
+        .region(region)
+        .build();
+
+    authToken = generator.getAuthToken(
+        GetIamAuthTokenRequest.builder()
+        .hostname(host)
+        .port(port)
+        .userName(username)
+        .build());
+  }
+
+  /**
+   * Return RDS access token for use as password.
+   *
+   */
+  public String getAuthToken() {
+    if (authToken == null) {
+      generateAuthToken();
+    }
+
+    System.err.println(authToken);
+    return authToken;
+  }
 }

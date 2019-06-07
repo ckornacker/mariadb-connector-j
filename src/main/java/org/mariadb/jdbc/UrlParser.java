@@ -68,7 +68,7 @@ import org.mariadb.jdbc.internal.util.constant.ParameterConstant;
 /**
  * <p>parse and verification of URL.</p>
  * <p>basic syntax :<br>
- * {@code jdbc:(mysql|mariadb):[replication:|failover|loadbalance:|aurora:]//<hostDescription>[,<hostDescription>]/[database>]
+ * {@code jdbc:(mysql|mariadb):[replication:|failover|loadbalance:|aurora:|iam:]//<hostDescription>[,<hostDescription>]/[database>]
  * [?<key1>=<value1>[&<key2>=<value2>]] }
  * </p>
  * <p>
@@ -92,7 +92,7 @@ public class UrlParser implements Cloneable {
   private static final Pattern URL_PARAMETER = Pattern
       .compile("(\\/([^\\?]*))?(\\?(.+))*", Pattern.DOTALL);
   private static final Pattern AWS_PATTERN = Pattern
-      .compile("(.+)\\.([a-z0-9\\-]+\\.rds\\.amazonaws\\.com)",
+      .compile("(.+)\\.(.+)\\.([a-z0-9\\-]+)\\.(rds\\.amazonaws\\.com)",
           Pattern.CASE_INSENSITIVE);
 
   private String database;
@@ -391,6 +391,18 @@ public class UrlParser implements Cloneable {
     if (acceptsUrl(url)) {
       parseInternal(this, url, new Properties());
     }
+  }
+
+  public String getAwsRegion() {
+    if (addresses != null) {
+      for (HostAddress hostAddress : addresses) {
+        Matcher matcher = AWS_PATTERN.matcher(hostAddress.host);
+        if (matcher.find()) {
+          return matcher.group(3);
+        }
+      }
+    }
+    return null;
   }
 
   public String getUsername() {
